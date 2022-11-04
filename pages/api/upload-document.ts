@@ -17,6 +17,10 @@ export interface ObjectLiteral {
   [key: string]: string;
 }
 
+interface ExtendedNextApiRequest extends NextApiRequest {
+  file: Express.Multer.File;
+}
+
 type Data = {
   name: string;
 };
@@ -47,7 +51,7 @@ const upload = multer({
 
 const allowedMimeTypes = ["image/png", "image/jpeg", "application/pdf"];
 
-const apiRoute = nextConnect<NextApiRequest, NextApiResponse>({
+const apiRoute = nextConnect<ExtendedNextApiRequest, NextApiResponse>({
   onError(error, req, res) {
     res.status(501).json({ error: `${error.message}` });
   },
@@ -59,7 +63,7 @@ const apiRoute = nextConnect<NextApiRequest, NextApiResponse>({
 const uploadMiddleware = upload.single("patient-registration-form");
 apiRoute.use(uploadMiddleware);
 
-apiRoute.post(async (req: NextApiRequest, res: NextApiResponse) => {
+apiRoute.post(async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
   const client = new DocumentAnalysisClient(
     formRecognizerEndpoint,
     new AzureKeyCredential(formRecognizerAPIKey)
@@ -73,7 +77,9 @@ apiRoute.post(async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { documents = [] } = await poller.pollUntilDone();
 
-  const fields = documents[0].fields ? documents[0].fields : {};
+  const fields = documents[0].fields
+    ? JSON.parse(JSON.stringify(documents[0].fields))
+    : {};
 
   const result: ObjectLiteral = {};
 
