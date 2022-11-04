@@ -1,6 +1,14 @@
 import fs from "fs";
 import path from "path";
-import { Box, Button, Icon, Image, Input } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Icon,
+  Image,
+  Input,
+} from "@chakra-ui/react";
 import { useCallback, useState } from "react";
 import { ObjectLiteral } from "./api/upload-document";
 import FormDataTable from "../src/components/FormDataTable";
@@ -56,10 +64,19 @@ export default function Home() {
   };
 
   return (
-    <Box>
+    <Box bg={"#242424"} height={"100vh"}>
+      <Flex
+        justifyContent={"center"}
+        as={"nav"}
+        bg="#0F6CBC"
+        color="white"
+        p={4}
+      >
+        <Heading fontSize={"2xl"}>Contoso Health Care</Heading>
+      </Flex>
       <Input
         onChange={handleFileInput}
-        placeholder="Select Date and Time"
+        placeholder="select a file"
         size="md"
         type="file"
       />
