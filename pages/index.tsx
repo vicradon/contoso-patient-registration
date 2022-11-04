@@ -1,13 +1,21 @@
 import fs from "fs";
 import path from "path";
-import { Box, Button, Icon, Image, Input } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Image,
+  Input,
+  FormControl,
+  FormLabel,
+  FormHelperText,
+} from "@chakra-ui/react";
 import { useCallback, useState } from "react";
 import { ObjectLiteral } from "./api/upload-document";
 import FormDataTable from "../src/components/FormDataTable";
 import { Spinner } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/react";
-import { pdfjs, Document, Page } from "react-pdf";
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function Home() {
   const [uploading, setUploading] = useState(false);
@@ -57,31 +65,56 @@ export default function Home() {
 
   return (
     <Box>
-      <Input
-        onChange={handleFileInput}
-        placeholder="Select Date and Time"
-        size="md"
-        type="file"
-      />
+      <Box
+        display="flex"
+        as={"nav"}
+        justifyContent="center"
+        alignItems="center"
+        color={"white"}
+        bg={"#0F6CBC"}
+        padding={4}
+      >
+        <Heading fontSize={"2xl"}>Contoso Patient Registration</Heading>
+      </Box>
 
-      {file?.type === "application/pdf" && (
-        <Document file={previewURL}>
-          <Page pageIndex={0} />
-        </Document>
-      )}
-      {fileIsImage && previewURL && (
-        <Image src={previewURL} alt="Preview file" />
-      )}
+      <Box minHeight={"100vh"} bg={"#242424"} color="white" padding={8}>
+        <Box as={"form"}>
+          <FormControl>
+            <FormLabel>Select Document</FormLabel>
 
-      <Button colorScheme="blue" onClick={uploadFile} disabled={uploading}>
-        {uploading ? <Spinner /> : "Upload"}
-      </Button>
+            <Input
+              onChange={handleFileInput}
+              placeholder="Select document"
+              size="md"
+              type="file"
+            />
 
-      {Object.keys(analysisResult).length > 0 && (
-        <Box>
-          <FormDataTable data={analysisResult} />
+            <FormHelperText>
+              File should be in PDF or image format
+            </FormHelperText>
+          </FormControl>
+
+          {fileIsImage && previewURL && (
+            <Image src={previewURL} alt="Preview file" />
+          )}
+
+          <Flex my={"1rem"} justifyContent="flex-end" alignItems="center">
+            <Button
+              colorScheme="blue"
+              onClick={uploadFile}
+              disabled={uploading}
+            >
+              {uploading ? <Spinner /> : "Upload"}
+            </Button>
+          </Flex>
         </Box>
-      )}
+
+        {Object.keys(analysisResult).length > 0 && (
+          <Box>
+            <FormDataTable data={analysisResult} />
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 }
