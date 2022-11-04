@@ -9,7 +9,6 @@ import {
   TableCaption,
   TableContainer,
 } from "@chakra-ui/react";
-import { ObjectLiteral } from "../../pages/api/upload-document";
 
 const FormDataTable = ({ data }: any) => {
   return (
