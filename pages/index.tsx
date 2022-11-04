@@ -1,6 +1,81 @@
-import Head from "next/head";
-import Image from "next/image";
+import fs from "fs";
+import path from "path";
+import { Box, Button, Icon, Input } from "@chakra-ui/react";
+import { useCallback, useState } from "react";
+import { ObjectLiteral } from "./api/upload-document";
+import FormDataTable from "../src/components/FormDataTable";
+import { Spinner } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 
 export default function Home() {
-  return <div>hi</div>;
+  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<ObjectLiteral>({});
+  const toast = useToast();
+
+  const uploadFile = useCallback(async () => {
+    if (file) {
+      setAnalysisResult({});
+      setUploading(true);
+
+      const formData = new FormData();
+      formData.append("patient-registration-form", file);
+
+      const res = await fetch("api/upload-document", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setAnalysisResult(data);
+        setUploading(false);
+      } else {
+        const resText = await res.text();
+        toast({
+          title: `${resText}`,
+          status: "error",
+          isClosable: true,
+        });
+        setUploading(false);
+      }
+    }
+  }, [file]);
+
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFile(event.target.files ? event.target.files[0] : null);
+  };
+
+  return (
+    <Box>
+      <Input
+        onChange={handleFileInput}
+        placeholder="Select Date and Time"
+        size="md"
+        type="file"
+      />
+
+      <Button colorScheme="blue" onClick={uploadFile} disabled={uploading}>
+        {uploading ? <Spinner /> : "Upload"}
+      </Button>
+
+      {Object.keys(analysisResult).length > 0 && (
+        <Box>
+          <FormDataTable data={analysisResult} />
+        </Box>
+      )}
+    </Box>
+  );
+}
+
+export async function getServerSideProps() {
+  const patientFormsDirectory = path.join(process.cwd(), "tmp/patient-forms/");
+
+  if (!fs.existsSync(patientFormsDirectory)) {
+    fs.mkdirSync(patientFormsDirectory, { recursive: true });
+  }
+
+  return {
+    props: {},
+  };
 }
