@@ -77,7 +77,7 @@ export default function Home() {
         <Heading fontSize={"2xl"}>Contoso Patient Registration</Heading>
       </Box>
 
-      <Box minHeight={"100vh"} bg={"#242424"} color="white" padding={8}>
+      <Box minHeight={"100vh"} padding={8}>
         <Box as={"form"}>
           <FormControl>
             <FormLabel>Select Document</FormLabel>
@@ -95,7 +95,9 @@ export default function Home() {
           </FormControl>
 
           {fileIsImage && previewURL && (
-            <Image src={previewURL} alt="Preview file" />
+            <Flex justifyContent={"center"} marginTop={4}>
+              <Image maxWidth={"500px"} src={previewURL} alt="Preview file" />
+            </Flex>
           )}
 
           <Flex my={"1rem"} justifyContent="flex-end" alignItems="center">
